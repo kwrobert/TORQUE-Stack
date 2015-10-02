@@ -28,8 +28,7 @@ runcmd:
   - HOSTNAME="$(hostname)"
   - echo "$IP $HOSTNAME" >> /etc/hosts
   - git clone https://github.com/adaptivecomputing/torque.git -b 5.1.1 torque_5.1.1
-  - cd 
-  torque_5.1.1
+  - cd torque_5.1.1
   - ./autogen.sh
   - ./configure
   - make
