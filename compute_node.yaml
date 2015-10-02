@@ -27,39 +27,29 @@ parameters:
   sec_group:
     type: string
     description: Security group for headnodes
-  metadata:
-    type: json
-    description: Information about the autoscaling stack this server resource is a part of
+  name: 
+    type: string
+    description: Name of the instance. Provided by compute_node_cluster.yaml
 
 resources:
   server:
     type: OS::Nova::Server
     properties:
-      name: compute_node
+      name: {get_param: name}
       flavor: {get_param: flavor}
       image: {get_param: image}
       key_name: {get_param: key_name}
-      metadata: {get_param: metadata}
       networks: [network: {get_param: network}]
       security_groups: [{get_param: sec_group}]
       user_data_format: RAW
       user_data: |
         #cloud-config
-        users:
-          - name: demo
-            groups: sudo
-            shell: /bin/bash
-            sudo: ['ALL=(ALL) NOPASSWD:ALL']
         chpasswd:
           list: |
-            demo:demo-password
-            root:root-password
+            root:stackops
+            centos:stackops
           expire: False
         ssh_pwauth: True
-        runcmd:
-          - touch /test.txt
-          - echo "!!!!!!!!!!!!!THIS IS CLOUD INIT!!!!!!!!!!!!!"
-          - sudo yum install stress
 
 outputs:
   server_ip:

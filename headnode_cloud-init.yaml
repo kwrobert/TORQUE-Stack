@@ -23,7 +23,7 @@ packages:
   - gcc
   - gcc-c++
   - git
-runcmd:
+runcmd: 
   - IP="$(ifconfig eth0 | grep "inet" | awk '{print $2;}' | head -1)"
   - HOSTNAME="$(hostname)"
   - echo "$IP $HOSTNAME" >> /etc/hosts
@@ -44,6 +44,3 @@ runcmd:
   - cp contrib/init.d/pbs_server /etc/init.d
   - chkconfig --add pbs_server
   - service pbs_server restart
-  
-  
-  

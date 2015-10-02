@@ -1,5 +1,5 @@
 #####################################################################################################
-# Script: torque_headnode.yaml
+# Script: headnode.yaml
 # Author: Kyle Robertson
 # Date: September 18, 2015
 # Company: Worlcom Exchange Inc.
@@ -22,18 +22,15 @@ parameters:
   flavor:
     type: string
     description: flavor used by the servers
-  pool_id:
-    type: string
-    description: Pool to contact
-  network:
+  internal_network:
     type: string
     description: Network used by the server
+  external_network:
+    type: string
+    description: Public facing external network where public IPs exist
   sec_group:
     type: string
     description: Security group for headnodes
-  metadata:
-    type: json
-    description: Information about the autoscaling stack this server resource is a part of
 
 resources:
   server:
@@ -43,38 +40,70 @@ resources:
       flavor: {get_param: flavor}
       image: {get_param: image}
       key_name: {get_param: key_name}
-      metadata: {get_param: metadata}
-      networks: [network: {get_param: network}]
+      networks: [network: {get_param: internal_network}]
       security_groups: [{get_param: sec_group}]
       user_data_format: RAW
       user_data: |
         #cloud-config
-        users:
-          - name: demo
-            groups: sudo
-            shell: /bin/bash
-            sudo: ['ALL=(ALL) NOPASSWD:ALL']
         chpasswd:
           list: |
-            demo:demo-password
-            root:root-password
+            root:stackops
+            centos:stackops
           expire: False
         ssh_pwauth: True
-        runcmd:
-          - touch /test.txt
-          - echo "!!!!!!!!!!!!!THIS IS CLOUD INIT!!!!!!!!!!!!!"
-          - sudo yum install stress
-  member:
-    type: OS::Neutron::PoolMember
+        package-update: true
+        package-upgrade: true
+        packages:
+          - libtool
+          - openssl-devel
+          - libxml2-devel
+          - boost-devel
+          - gcc
+          - gcc-c++
+          - git
+        runcmd: 
+          - IP="$(ifconfig eth0 | grep "inet" | awk '{print $2;}' | head -1)"
+          - HOSTNAME="$(hostname)"
+          - echo "$IP $HOSTNAME" >> /etc/hosts
+          - git clone https://github.com/adaptivecomputing/torque.git -b 5.1.1 torque_5.1.1
+          - cd torque_5.1.1
+          - echo "#!!!! I AM IN TORQUE DIRECTORY !!!!#"
+          - ./autogen.sh
+          - ./configure
+          - make
+          - make install
+          - cp contrib/init.d/trqauthd /etc/init.d/
+          - chkconfig --add trqauthd
+          - echo /usr/local/lib > /etc/ld.so.conf.d/torque.conf
+          - ldconfig
+          - service trqauthd start
+          - echo $(hostname) >> /var/spool/torque/server_name
+          - export PATH=/usr/local/bin/:/usr/local/sbin/:$PATH
+          - ./torque.setup root
+          - cp contrib/init.d/pbs_server /etc/init.d
+          - chkconfig --add pbs_server
+          - service pbs_server restart
+        
+  #public_port:  
+  #  type: OS::Neutron::Port
+  #  properties:
+  #    fixed_ips: [subnet: {get_param: external_network}]
+          
+  floating_ip:
+     type: OS::Neutron::FloatingIP
+     properties:
+       floating_network: {get_param: external_network}
+       
+  floating_ip_association:
+    type: OS::Neutron::FloatingIPAssociation
     properties:
-      pool_id: {get_param: pool_id}
-      address: {get_attr: [server, first_address]}
-      protocol_port: 22
-
+      floatingip_id: { get_resource: floating_ip }
+      port_id: {get_attr: [server, addresses, {get_param: internal_network}, 0, port]}
+       
 outputs:
-  server_ip:
-    description: IP Address of the load-balanced server.
-    value: { get_attr: [server, first_address] }
-  lb_member:
-    description: LB member details.
-    value: { get_attr: [member, show] }
+  private_headnode_ip:
+    description: Private IP address of headnode
+    value: {get_attr: [server, networks, {get_param: internal_network}, 0]}
+  public_headnode_ip:
+    description: Public IP Address of the headnode
+    value: {get_attr: [floating_ip, floating_ip_address]}

@@ -11,16 +11,16 @@ description: Homogenous compute cluster
 
 parameters:
 
-  load_balancer_ip:
+  headnode_public_ip:
     type: string
-    label: Floating IP of Load Balancer
-    description: "The public (i.e floating) IP address of the load balancer for the headnode autoscaling group"
+    label: Floating IP of Headnode
+    description: "The public (i.e floating) IP address of the headnode"
     constraints:
       - allowed_pattern: "^[0-9]+.[0-9]+.[0-9]+.[0-9]+$"
-  pool_ip:
+  headnode_private_ip:
     type: string
-    label: Internal IP of Load Balancer
-    description: "The internal IP address of the load balancer for the headnode autoscaling group"
+    label: Floating IP of Headnode
+    description: "The public (i.e floating) IP address of the headnode"
     constraints:
       - allowed_pattern: "^[0-9]+.[0-9]+.[0-9]+.[0-9]+$"
   source_cidr:
@@ -42,7 +42,7 @@ resources:
       action: allow
       protocol: tcp
       destination_port: 22
-      destination_ip_address: {get_param: load_balancer_ip}
+      destination_ip_address: {get_param: headnode_public_ip}
       source_ip_address: {get_param: source_cidr}
    
   public_icmp_rule:
@@ -52,7 +52,7 @@ resources:
       description: Allow ICMP access to head nodes
       action: allow
       protocol: icmp
-      destination_ip_address: {get_param: load_balancer_ip}
+      destination_ip_address: {get_param: headnode_public_ip}
       source_ip_address: {get_param: source_cidr} 
       
   private_ssh_rule:
@@ -63,7 +63,7 @@ resources:
       action: allow
       protocol: tcp
       destination_port: 22
-      destination_ip_address: {get_param: pool_ip}
+      destination_ip_address: {get_param: headnode_private_ip}
       source_ip_address: {get_param: source_cidr}
    
   private_icmp_rule:
@@ -73,7 +73,7 @@ resources:
       description: Allow ICMP access to head nodes
       action: allow
       protocol: icmp
-      destination_ip_address: {get_param: pool_ip}
+      destination_ip_address: {get_param: headnode_private_ip}
       source_ip_address: {get_param: source_cidr} 
       
   allow_outbound_rule:

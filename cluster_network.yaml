@@ -31,7 +31,7 @@ parameters:
     source_cidr:
       type: string
       label: Source network CIDR
-      description: THe name of the source network where all traffic to the headnodes will be coming from
+      description: The name of the source network where all traffic to the headnodes will be coming from
       constraints:
         - allowed_pattern: "^[0-9]+.[0-9]+.[0-9]+.[0-9]+/[0-9]+$"
           
@@ -74,8 +74,8 @@ resources:
          - {"protocol": icmp,"direction":ingress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
          - {"protocol": tcp,"direction":ingress,"port_range_min": 22,"port_range_max": 22,"remote_mode": remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}   
          # Allow head nodes to communicate to compute nodes on correct ports
-         - {"protocol":tcp,"direction":egress,"port_range_min":15001,"port_range_max"15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
-         - {"protocol":tcp,"direction":ingress,"port_range_min":15001,"port_range_max"15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
+         - {"protocol":tcp,"direction":egress,"port_range_min":15001,"port_range_max":15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
+         - {"protocol":tcp,"direction":ingress,"port_range_min":15001,"port_range_max":15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
          # Egress to all
          - {"protocol": icmp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
          - {"protocol": tcp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
@@ -93,8 +93,8 @@ resources:
          - {"protocol": icmp,"direction":ingress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
          - {"protocol": tcp,"direction":ingress,"port_range_min": 22,"port_range_max": 22,"remote_mode": remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
          # Allow compute nodes to communicate to head nodes on correct ports
-         - {"protocol":tcp,"direction":ingress,"port_range_min":15001,"port_range_max"15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
-         - {"protocol":tcp,"direction":egress,"port_range_min":15001,"port_range_max"15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
+         - {"protocol":tcp,"direction":ingress,"port_range_min":15001,"port_range_max":15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
+         - {"protocol":tcp,"direction":egress,"port_range_min":15001,"port_range_max":15003,"remote_mode":remote_ip_prefix,"remote_ip_prefix": {get_param: subnet_cidr}}
          # Egress to all
          - {"protocol": icmp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
          - {"protocol": tcp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
