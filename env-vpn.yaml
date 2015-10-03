@@ -1,0 +1,6 @@
+parameters:
+   network_name: ComputeNet
+   subnet_cidr: 10.20.18.0/24
+   cluster_size: 4
+   source_network: 10.1.1.0/24
+   image: CentOS 7

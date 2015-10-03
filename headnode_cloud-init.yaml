@@ -8,10 +8,10 @@
 
 #cloud-config
 chpasswd:
- list: |
-   root:stackops
-   centos:stackops
- expire: False
+  list: |
+    root:stackops
+    centos:stackops
+  expire: False
 ssh_pwauth: True
 package-update: true
 package-upgrade: true
@@ -23,6 +23,7 @@ packages:
   - gcc
   - gcc-c++
   - git
+  - nmap
 runcmd: 
   - IP="$(ifconfig eth0 | grep "inet" | awk '{print $2;}' | head -1)"
   - HOSTNAME="$(hostname)"

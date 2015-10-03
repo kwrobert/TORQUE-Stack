@@ -38,7 +38,7 @@ parameters:
     # Computing parameters
     cluster_size:
       type: number
-      description: Minimum number of servers in the autoscaling cluster
+      description: Minimum number of servers in the compute node cluster
       constraints:
         - range: {min: 2, max: 20}
       default: 2
