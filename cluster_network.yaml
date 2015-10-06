@@ -99,6 +99,11 @@ resources:
          - {"protocol": icmp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
          - {"protocol": tcp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
          - {"protocol": udp,"direction":egress,"remote_mode": remote_ip_prefix,"remote_ip_prefix": 0.0.0.0/0}
+         
+   keypair:
+     type: OS::Nova::KeyPair
+     properties:
+       name: torque_keypair
               
 outputs:
     compute_net:
@@ -109,6 +114,8 @@ outputs:
       value: {get_resource: headnode_sec_group}
     computenode_sec_group:
       value: {get_resource: computenode_sec_group}
+    ssh_keypair:
+      value: {get_resource: keypair}
        
     
 

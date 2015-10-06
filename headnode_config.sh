@@ -1,17 +1,8 @@
-#####################################################################################################
-# Script: headnode_config.sh
-# Author: Kyle Robertson
-# Date: September 18, 2015
-# Company: Worlcom Exchange Inc.
-# Description: A cloud init file for installing TORQUE and all its dependencies on compute nodes
-#####################################################################################################
-
 #!/bin/bash
 
 echo "root:stackops" | chpasswd
 echo "centos:stackops" | chpasswd
-yum update
-yum install libtool openss-devel libxml2-devel boost-devel gcc gcc-c++ git nmap 
+yum -y install libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nmap 
 IP="$(ifconfig eth0 | grep "inet" | awk '{print $2;}' | head -1)"
 HOSTNAME="$(hostname)"
 echo "$IP $HOSTNAME" >> /etc/hosts

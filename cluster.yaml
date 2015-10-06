@@ -1,5 +1,5 @@
 #####################################################################################################
-# Script: cluster_network.yaml
+# Script: cluster.yaml
 # Author: Kyle Robertson
 # Date: September 18, 2015
 # Company: Worlcom Exchange Inc.
@@ -28,7 +28,7 @@ parameters:
       type: string
       label: External Network UUID
       description: UUID of the external network where floating IP's for environment exist
-      default: 87b4198b-f747-4deb-9b77-b32c9fc9d0cf
+      default: net04_ext
     source_network:
       type: string
       label: Source Network CIDR
@@ -57,11 +57,6 @@ parameters:
           - m1.medium
           - m1.large
       default: m1.large
-    key:
-      type: string
-      label: Key name
-      description: Name for SSH keypair used to access instances
-      default: compute_host_key
       
 resources:
     networking_infrastructure:
@@ -77,7 +72,7 @@ resources:
       properties:
         flavor: {get_param: flavor}
         image: {get_param: image}
-        key_name: {get_param: key}
+        key_name: {get_attr: [networking_infrastructure, ssh_keypair]}
         internal_network: {get_param: network_name}
         external_network: {get_param: external_network}
         sec_group: {get_attr: [networking_infrastructure, headnode_sec_group]}
@@ -88,7 +83,7 @@ resources:
         internal_net: {get_attr: [networking_infrastructure, compute_net]} 
         flavor: { get_param: flavor }
         image: { get_param: image }
-        ssh_key: { get_param: key }
+        ssh_key: {get_attr: [networking_infrastructure, ssh_keypair]}
         cluster_size: {get_param: cluster_size}
         internal_net: { get_param: network_name }
         sec_group: {get_attr: [networking_infrastructure, computenode_sec_group]}
