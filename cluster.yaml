@@ -46,7 +46,7 @@ parameters:
       type: string
       label: Image name or ID
       description: Bootable image used to boot all instances
-      default: CentOS 6
+      default: CentOS 7
     flavor:
       type: string
       label: Instance flavor
@@ -57,6 +57,10 @@ parameters:
           - m1.medium
           - m1.large
       default: m1.large
+    keypair:
+      type: string
+      label: Keypair Name
+      description: Name of preexisting keypair to use for ssh access to instances 
       
 resources:
     networking_infrastructure:
@@ -69,10 +73,11 @@ resources:
     
     headnode:
       type: headnode.yaml
+      depends_on: compute_infrastructure
       properties:
         flavor: {get_param: flavor}
         image: {get_param: image}
-        key_name: {get_attr: [networking_infrastructure, ssh_keypair]}
+        key_name: {get_param: keypair}
         internal_network: {get_param: network_name}
         external_network: {get_param: external_network}
         sec_group: {get_attr: [networking_infrastructure, headnode_sec_group]}
@@ -83,7 +88,7 @@ resources:
         internal_net: {get_attr: [networking_infrastructure, compute_net]} 
         flavor: { get_param: flavor }
         image: { get_param: image }
-        ssh_key: {get_attr: [networking_infrastructure, ssh_keypair]}
+        ssh_key: {get_param: keypair}
         cluster_size: {get_param: cluster_size}
         internal_net: { get_param: network_name }
         sec_group: {get_attr: [networking_infrastructure, computenode_sec_group]}

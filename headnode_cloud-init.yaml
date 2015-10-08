@@ -1,3 +1,5 @@
+#cloud-config
+
 #####################################################################################################
 # Script: compute_cloud-init.yaml
 # Author: Kyle Robertson
@@ -6,7 +8,6 @@
 # Description: A cloud init file for installing TORQUE and all its dependencies on compute nodes
 #####################################################################################################
 
-#cloud-config
 chpasswd:
   list: |
     root:stackops
